@@ -171,29 +171,35 @@ const HEADLINES: Record<RiskLevel, string> = {
   unknown: "판단할 정보가 부족합니다",
 };
 
-/** 등급별 화면 색상. Tailwind 클래스를 한곳에서 관리한다. */
+/**
+ * 등급별 화면 표현.
+ *
+ * 색은 신호에만 쓴다. 판정이 danger·warning일 때만 색이 나타나고, 그 아래는
+ * 무채색으로 물러선다. 나머지 화면이 전부 흑백이라야 이 빨강이 빨강으로 읽힌다.
+ * 배지는 알약, 패널은 각진 면 — 이 시스템의 도형 어휘 그대로다.
+ */
 export const RISK_STYLE: Record<
   RiskLevel,
   { badge: string; panel: string; label: string }
 > = {
   danger: {
-    badge: "bg-red-600 text-white",
-    panel: "border-red-300 bg-red-50",
+    badge: "bg-hazard-danger text-canvas",
+    panel: "border-hazard-danger",
     label: "위험",
   },
   warning: {
-    badge: "bg-orange-500 text-white",
-    panel: "border-orange-300 bg-orange-50",
+    badge: "bg-hazard-warning text-canvas",
+    panel: "border-hazard-warning",
     label: "주의",
   },
   caution: {
-    badge: "bg-amber-400 text-amber-950",
-    panel: "border-amber-300 bg-amber-50",
+    badge: "bg-ink text-canvas",
+    panel: "border-ink",
     label: "유의",
   },
   unknown: {
-    badge: "bg-slate-500 text-white",
-    panel: "border-slate-300 bg-slate-50",
+    badge: "bg-cloud text-mute",
+    panel: "border-hairline",
     label: "정보 부족",
   },
 };

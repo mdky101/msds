@@ -2,13 +2,69 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 @import "tailwindcss";
 
-/* 현장에서 밝은 조명 아래 쓰는 앱이라 라이트 테마로 고정한다. */
-@theme inline {
+/*
+ * 디자인 시스템: 편집적 절제 (Nike 커머스 시스템 기반)
+ *
+ * 핵심은 "색은 신호에만 쓴다"이다. ink/canvas/cloud 세 가지가 화면의 95%를 덮고,
+ * 색이 나타나면 그건 반드시 의미가 있다. 이 앱에는 잘 맞는다 — 위험도 색은
+ * 장식이 아니라 신호이기 때문이다. 그래서 나머지를 전부 무채색으로 눌러야
+ * 빨강이 진짜 빨강으로 읽힌다.
+ *
+ * 원본과 다르게 간 곳:
+ * - display 폰트: Bebas Neue는 한글이 없다. 96px 대문자 Futura 로크업은 한글로
+ *   재현 불가(대문자 개념 자체가 없음). Pretendard 900 + line-height 0.95 +
+ *   타이트한 자간으로 같은 "빌보드" 효과를 한글 방식으로 낸다.
+ * - hazard-warning: 원본 팔레트에 주황이 없다. 위험도는 4단계가 필요하므로
+ *   토큰 하나만 추가했다. red(sale)는 원본 것을 그대로 쓴다.
+ */
+@theme {
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, system-ui,
     sans-serif;
+
+  /* 화면의 95%를 덮는 세 가지 */
+  --color-ink: #111111;
+  --color-canvas: #ffffff;
+  --color-cloud: #f5f5f5;
+
+  /* 이 시스템의 유일한 "그림자" — 1px 실선 */
+  --color-hairline: #cacacb;
+  --color-hairline-soft: #e5e5e5;
+
+  /* 글자 위계 */
+  --color-charcoal: #39393b;
+  --color-mute: #707072;
+  --color-stone: #9e9ea0;
+
+  /* 신호색. 여기 있는 것 외에는 화면에 색이 없어야 한다. */
+  --color-sale: #d30005;
+  --color-success: #007d48;
+  --color-info: #1151ff;
+
+  /* 위험도 신호. sale의 빨강을 최고 위험에 그대로 쓴다 — 이 시스템의 유일한 빨강. */
+  --color-hazard-danger: #d30005;
+  --color-hazard-warning: #b45309;
+
+  /* 이 시스템의 도형 어휘는 알약과 원, 둘뿐이다. 각진 버튼은 없다. */
+  --radius-pill: 30px;
+  --radius-field: 24px;
 }
 
 html {
   /* iOS에서 화면 회전 시 글자 크기가 멋대로 커지는 것을 막는다 */
   -webkit-text-size-adjust: 100%;
+}
+
+/*
+ * 편집 로크업. 원본의 96px 대문자 Futura 자리다.
+ * 한글은 900 웨이트로 눌러 담고 자간을 좁혀야 비슷한 밀도가 나온다.
+ */
+@utility display-lockup {
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+}
+
+/* 접힘 화살표는 기본 삼각형 대신 직접 그린다 */
+summary::-webkit-details-marker {
+  display: none;
 }

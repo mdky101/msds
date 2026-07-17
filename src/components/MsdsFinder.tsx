@@ -67,24 +67,25 @@ export default function MsdsFinder({
   }
 
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="border-hairline space-y-5 border-t pt-6">
       <div>
-        <h3 className="font-semibold text-slate-900">국문 MSDS 찾기</h3>
-        <p className="mt-1 text-xs text-slate-500">
+        <h3 className="text-ink text-base font-medium">국문 MSDS 찾기</h3>
+        <p className="text-mute mt-1 text-xs">
           제품명이 잘못 읽혔으면 고쳐서 다시 검색하세요.
         </p>
+        {/* 검색 알약. 기본은 cloud 위 테두리 없음, 포커스에서만 ink 테두리가 선다. */}
         <form onSubmit={submit} className="mt-3 flex gap-2">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="제품명, 물질명 또는 CAS 번호"
             aria-label="검색어"
-            className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+            className="rounded-field bg-cloud text-ink placeholder:text-mute focus:bg-canvas focus:border-ink min-w-0 flex-1 border-2 border-transparent px-4 py-2.5 text-base focus:outline-none"
           />
           <button
             type="submit"
             disabled={!query.trim()}
-            className="shrink-0 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+            className="rounded-pill bg-ink text-canvas shrink-0 px-5 py-2.5 text-sm font-medium transition-transform active:scale-95 disabled:opacity-30"
           >
             검색
           </button>
@@ -149,24 +150,24 @@ function Group({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-t border-slate-100 pt-4">
-      <h4 className="text-sm font-semibold text-slate-800">{title}</h4>
-      <p className="mt-0.5 text-xs text-slate-400">{hint}</p>
-      <div className="mt-2.5">{children}</div>
+    <div className="border-hairline border-t pt-4">
+      <h4 className="text-ink text-sm font-medium">{title}</h4>
+      <p className="text-mute mt-0.5 text-xs leading-relaxed">{hint}</p>
+      <div className="mt-3">{children}</div>
     </div>
   );
 }
 
 function Loading({ label }: { label: string }) {
   return (
-    <p role="status" className="text-sm text-slate-500">
+    <p role="status" className="text-mute text-sm">
       {label}
     </p>
   );
 }
 
 function ErrorLine({ message }: { message: string }) {
-  return <p className="text-sm text-red-700">{message}</p>;
+  return <p className="text-hazard-danger text-sm">{message}</p>;
 }
 
 function KoshaResults({
@@ -178,18 +179,19 @@ function KoshaResults({
 }) {
   if (outcome.hits.length === 0) {
     return (
-      <p className="rounded-xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+      <p className="bg-cloud text-charcoal p-3 text-xs leading-relaxed">
         공단에서 찾지 못했습니다. 상표명 제품은 대개 여기 없으니 위의 제조사 자료를
         보세요. 법정 자료가 필요하면 용기 성분표의{" "}
-        <strong>물질명이나 CAS 번호</strong>로 다시 검색하면 걸립니다.
+        <strong className="text-ink font-medium">물질명이나 CAS 번호</strong>로
+        다시 검색하면 걸립니다.
       </p>
     );
   }
 
   return (
     <>
-      <p className="text-xs text-slate-500">
-        <strong className="text-slate-700">
+      <p className="text-mute text-xs">
+        <strong className="text-ink font-medium">
           &ldquo;{outcome.usedQuery}&rdquo;
         </strong>
         (으)로 찾은 {outcome.hits.length}건 · CAS가 일치하는 항목을 고르세요
@@ -217,18 +219,18 @@ function KoshaRow({ hit }: { hit: ChemHit }) {
       <input type="hidden" name="chem_id" value={hit.chemId} />
       <button
         type="submit"
-        className="flex w-full items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:border-blue-400 hover:bg-blue-50"
+        className="border-hairline hover:border-ink flex w-full items-center gap-3 border-b py-3 text-left transition-colors"
       >
         <span className="min-w-0 flex-1">
-          <span className="block font-medium break-words text-slate-900">
+          <span className="text-ink block font-medium break-words">
             {hit.nameKor}
           </span>
-          <span className="mt-0.5 block text-xs text-slate-500">
+          <span className="text-mute mt-0.5 block text-xs">
             {hit.casNo ? `CAS ${hit.casNo}` : "CAS 없음"}
             {hit.lastDate && ` · 갱신 ${hit.lastDate}`}
           </span>
         </span>
-        <span className="shrink-0 text-xs font-semibold text-blue-700">
+        <span className="text-ink shrink-0 text-xs font-medium underline underline-offset-4">
           원본 보기 ↗
         </span>
       </button>
@@ -236,11 +238,15 @@ function KoshaRow({ hit }: { hit: ChemHit }) {
   );
 }
 
+/**
+ * 출처 등급 배지. 믿을 수 있는 두 등급만 색을 채우고, 나머지는 cloud로 물러선다.
+ * 2차 출처만 주의색 글자를 쓴다 — 배경까지 칠하면 위쪽 위험도 판정과 색이 경쟁한다.
+ */
 const TIER_STYLE: Record<SourceTier, string> = {
-  government: "bg-emerald-100 text-emerald-800",
-  official: "bg-blue-100 text-blue-800",
-  vendor: "bg-slate-100 text-slate-600",
-  aggregator: "bg-amber-100 text-amber-800",
+  government: "bg-success text-canvas",
+  official: "bg-ink text-canvas",
+  vendor: "bg-cloud text-mute",
+  aggregator: "bg-cloud text-hazard-warning",
 };
 
 function WebResults({
@@ -254,7 +260,7 @@ function WebResults({
 }) {
   if (outcome.hits.length === 0) {
     return (
-      <p className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
+      <p className="bg-cloud text-charcoal p-3 text-xs leading-relaxed">
         웹에서도 찾지 못했습니다. 제품명을 라벨에 인쇄된 그대로(영문 포함) 입력해
         보세요.
       </p>
@@ -278,10 +284,12 @@ function WebResults({
           </li>
         ))}
       </ul>
-      <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
-        <strong>제품 변형에 주의하세요.</strong> 같은 브랜드라도 종류마다(예:
-        일반형·탈지제·건성윤활) MSDS가 다릅니다. 손에 든 용기에 적힌 정확한
-        제품명과 검색 결과가 같은지 확인하세요.
+      <p className="border-hazard-warning text-charcoal mt-4 border-l-2 pl-3 text-xs leading-relaxed">
+        <strong className="text-hazard-warning font-medium">
+          제품 변형에 주의하세요.
+        </strong>{" "}
+        같은 브랜드라도 종류마다(예: 일반형·탈지제·건성윤활) MSDS가 다릅니다. 손에
+        든 용기에 적힌 정확한 제품명과 검색 결과가 같은지 확인하세요.
       </p>
     </>
   );
@@ -293,24 +301,24 @@ function WebRow({ hit }: { hit: WebHit }) {
       href={hit.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-xl border border-slate-200 p-3 transition-colors hover:border-blue-400 hover:bg-blue-50"
+      className="border-hairline hover:border-ink block border-b py-3 transition-colors"
     >
       <span className="flex flex-wrap items-center gap-1.5">
         <span
-          className={`rounded px-1.5 py-0.5 text-[11px] font-semibold ${TIER_STYLE[hit.grade.tier]}`}
+          className={`rounded-pill px-2.5 py-0.5 text-[11px] font-medium ${TIER_STYLE[hit.grade.tier]}`}
         >
           {hit.grade.label}
         </span>
         {hit.isPdf && (
-          <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[11px] font-semibold text-white">
+          <span className="rounded-pill border-hairline text-mute border px-2.5 py-0.5 text-[11px] font-medium">
             PDF
           </span>
         )}
       </span>
-      <span className="mt-1.5 block font-medium break-words text-slate-900">
+      <span className="text-ink mt-1.5 block font-medium break-words">
         {hit.title}
       </span>
-      <span className="mt-0.5 block text-xs break-all text-slate-500">
+      <span className="text-mute mt-0.5 block text-xs break-all">
         {hit.grade.note}
       </span>
     </a>

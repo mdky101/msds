@@ -68,29 +68,32 @@ export default function Scanner() {
       />
 
       {state.phase === "idle" ? (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="flex w-full flex-col items-center gap-3 rounded-3xl border-2 border-dashed border-slate-300 bg-white px-6 py-16 transition-colors hover:border-blue-400 hover:bg-blue-50/50 active:bg-blue-50"
-        >
+        // 촬영 전 화면. 사진이 들어올 자리를 cloud로 비워두고, 그 위에 검은 알약
+        // 하나만 얹는다 — 이 시스템에서 "이미지 위 CTA"가 놓이는 자리 그대로다.
+        <div className="bg-cloud flex flex-col items-center gap-5 px-6 py-16">
           <CameraIcon />
-          <span className="text-lg font-semibold text-slate-900">
-            제품 라벨 촬영하기
-          </span>
-          <span className="max-w-xs text-center text-sm text-slate-500">
+          <p className="text-mute max-w-xs text-center text-sm leading-relaxed">
             그림문자와 성분표가 함께 보이도록 찍으면 가장 정확합니다
-          </span>
-        </button>
+          </p>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="rounded-pill bg-ink text-canvas px-8 py-4 text-base font-medium transition-transform active:scale-95"
+          >
+            제품 라벨 촬영하기
+          </button>
+        </div>
       ) : (
         <div className="space-y-5">
-          {/* 사진과 다시 찍기를 붙여 둔다. 결과가 길어져도 스크롤을 내리지 않고
-              바로 다시 찍을 수 있어야 한다. */}
+          {/* 사진은 이 시스템의 제품 사진과 같은 자리에 놓인다 — cloud 위에 여백 없이,
+              테두리 없이. 화면에서 유일하게 색을 가진 면이다. 바로 아래 "다시 촬영"을
+              붙여 결과가 길어져도 스크롤 없이 다시 찍을 수 있게 한다. */}
           {state.preview && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={state.preview}
               alt="촬영한 라벨"
-              className="max-h-72 w-full rounded-2xl border border-slate-200 object-contain"
+              className="bg-cloud max-h-72 w-full object-contain"
             />
           )}
 
@@ -98,7 +101,7 @@ export default function Scanner() {
             <button
               type="button"
               onClick={reset}
-              className="w-full rounded-2xl bg-slate-900 py-3.5 text-base font-semibold text-white transition-colors hover:bg-slate-700 active:bg-slate-800"
+              className="rounded-pill bg-ink text-canvas w-full py-3.5 text-base font-medium transition-transform active:scale-95"
             >
               다시 촬영하기
             </button>
@@ -107,9 +110,11 @@ export default function Scanner() {
           {state.phase === "reading" && <ReadingIndicator />}
 
           {state.phase === "error" && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
-              <h2 className="font-semibold text-red-900">판독하지 못했습니다</h2>
-              <p className="mt-1 text-sm text-red-800">{state.message}</p>
+            <div className="border-hazard-danger border p-5">
+              <h2 className="text-hazard-danger font-medium">
+                판독하지 못했습니다
+              </h2>
+              <p className="text-charcoal mt-1 text-sm">{state.message}</p>
             </div>
           )}
 
@@ -122,12 +127,9 @@ export default function Scanner() {
 
 function ReadingIndicator() {
   return (
-    <div
-      role="status"
-      className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-5"
-    >
-      <span className="size-5 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
-      <span className="text-sm font-medium text-slate-700">
+    <div role="status" className="bg-cloud flex items-center gap-3 p-5">
+      <span className="border-hairline border-t-ink size-5 animate-spin rounded-full border-2" />
+      <span className="text-charcoal text-sm font-medium">
         라벨을 읽는 중입니다…
       </span>
     </div>
@@ -142,7 +144,7 @@ function CameraIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      className="size-12 text-slate-400"
+      className="text-mute size-12"
     >
       <path
         strokeLinecap="round"
