@@ -10,21 +10,22 @@ export default function VerdictCard({ result }: { result: AnalyzeResult }) {
     reading.productName ?? reading.ingredients[0] ?? reading.casNumbers[0] ?? "";
 
   return (
-    <div className="space-y-6">
-      {/* 판정. 이 화면에서 색이 허용된 유일한 자리다. */}
-      <section className={`border-2 p-5 ${style.panel}`}>
+    <div className="space-y-4">
+      {/* 판정. 색 테두리를 두르지 않고 배경 틴트와 작은 알약 하나로만 말한다. */}
+      <section className={`border-hairline rounded-lg border p-6 ${style.panel}`}>
         <span
-          className={`rounded-pill inline-block px-4 py-1 text-sm font-medium ${style.badge}`}
+          className={`eyebrow inline-block rounded-full px-2.5 py-1 ${style.badge}`}
         >
           {style.label}
         </span>
-        <h2 className="display-lockup text-ink mt-3 text-2xl">
-          {verdict.headline}
-        </h2>
+        <h2 className="heading-2 text-ink mt-3">{verdict.headline}</h2>
         <ul className="mt-4 space-y-1.5">
           {verdict.reasons.map((reason) => (
-            <li key={reason} className="text-charcoal flex gap-2 text-sm">
-              <span aria-hidden className="text-mute">
+            <li
+              key={reason}
+              className="text-ink-secondary flex gap-2 text-[15px] leading-relaxed"
+            >
+              <span aria-hidden className="text-ink-faint">
                 ·
               </span>
               <span>{reason}</span>
@@ -34,26 +35,23 @@ export default function VerdictCard({ result }: { result: AnalyzeResult }) {
       </section>
 
       {reading.pictograms.length > 0 && (
-        <section>
-          <h3 className="text-mute text-xs font-medium">
-            라벨에서 찾은 그림문자
-          </h3>
-          <ul className="mt-3">
+        <section className="border-hairline bg-surface rounded-lg border p-6">
+          <h3 className="eyebrow text-ink-muted">라벨에서 찾은 그림문자</h3>
+          <ul className="mt-3 space-y-3">
             {reading.pictograms.map((code) => {
               const info = GHS_CATALOG[code];
               return (
-                <li
-                  key={code}
-                  className="border-hairline flex items-start gap-3 border-b py-3 last:border-b-0"
-                >
-                  <span className="text-mute mt-0.5 shrink-0 font-mono text-xs">
+                <li key={code} className="flex items-start gap-3">
+                  <span className="bg-canvas text-ink-muted rounded-xs mt-0.5 shrink-0 px-1.5 py-0.5 font-mono text-[11px]">
                     {code}
                   </span>
-                  <span className="text-sm">
-                    <strong className="text-ink font-medium">{info.name}</strong>
-                    <span className="text-mute"> — {info.symbol}</span>
+                  <span className="text-[15px]">
+                    <strong className="text-ink font-semibold">
+                      {info.name}
+                    </strong>
+                    <span className="text-ink-muted"> — {info.symbol}</span>
                     <br />
-                    <span className="text-charcoal">{info.meaning}</span>
+                    <span className="text-ink-secondary">{info.meaning}</span>
                   </span>
                 </li>
               );
@@ -75,8 +73,10 @@ export default function VerdictCard({ result }: { result: AnalyzeResult }) {
 
       <NextStepPanel step={nextStep} />
 
-      <p className="bg-cloud text-mute p-4 text-xs leading-relaxed">
-        <strong className="text-ink font-medium">이 판정은 참고용입니다.</strong>{" "}
+      <p className="text-ink-muted px-1 text-sm leading-relaxed">
+        <strong className="text-ink-secondary font-semibold">
+          이 판정은 참고용입니다.
+        </strong>{" "}
         사진 판독은 라벨이 가려지거나 흐릴 때 틀릴 수 있고, 그림문자가 보이지
         않는다고 해서 안전한 물질이라는 뜻이 아닙니다. 법적 효력이 있는 자료는 해당
         제품의 원본 MSDS이며, 취급 전 반드시 원본을 확인하세요.
@@ -98,28 +98,28 @@ function LabelFacts({ reading }: { reading: AnalyzeResult["reading"] }) {
   if (rows.length === 0 && reading.hazardStatements.length === 0) return null;
 
   return (
-    <section>
-      <h3 className="text-mute text-xs font-medium">라벨에서 읽은 내용</h3>
-      <p className="text-mute mt-1 text-xs">
+    <section className="border-hairline bg-surface rounded-lg border p-6">
+      <h3 className="eyebrow text-ink-muted">라벨에서 읽은 내용</h3>
+      <p className="text-ink-muted mt-1 text-sm">
         아래 내용이 사진과 다르면 다시 촬영해 주세요.
       </p>
       <dl className="mt-3">
         {rows.map(([label, value]) => (
           <div
             key={label}
-            className="border-hairline grid grid-cols-[5.5rem_1fr] gap-2 border-b py-2.5 text-sm"
+            className="border-hairline grid grid-cols-[5.5rem_1fr] gap-2 border-b py-2.5 text-[15px] last:border-b-0"
           >
-            <dt className="text-mute">{label}</dt>
+            <dt className="text-ink-muted">{label}</dt>
             <dd className="text-ink font-medium break-words">{value}</dd>
           </div>
         ))}
       </dl>
       {reading.hazardStatements.length > 0 && (
         <>
-          <h4 className="text-mute mt-5 text-xs font-medium">유해·위험 문구</h4>
+          <h4 className="eyebrow text-ink-muted mt-5">유해·위험 문구</h4>
           <ul className="mt-2 space-y-1">
             {reading.hazardStatements.map((s) => (
-              <li key={s} className="text-charcoal text-sm">
+              <li key={s} className="text-ink-secondary text-[15px]">
                 {s}
               </li>
             ))}
@@ -136,9 +136,9 @@ function NextStepPanel({ step }: { step: AnalyzeResult["nextStep"] }) {
 
   if (step.kind === "need_ingredient_side") {
     return (
-      <section className="bg-cloud p-5">
-        <h3 className="text-ink font-medium">성분표를 찍으면 더 정확합니다</h3>
-        <p className="text-charcoal mt-1 text-sm leading-relaxed">
+      <section className="border-hairline bg-surface rounded-lg border p-6">
+        <h3 className="title-md text-ink">성분표를 찍으면 더 정확합니다</h3>
+        <p className="text-ink-secondary mt-1 text-[15px] leading-relaxed">
           {step.productName ? `"${step.productName}"에서 ` : ""}CAS 번호를 찾지
           못했습니다. 용기 뒷면이나 옆면의 성분표를 찍으면 물질을 정확히 특정할 수
           있습니다.
@@ -148,10 +148,10 @@ function NextStepPanel({ step }: { step: AnalyzeResult["nextStep"] }) {
   }
 
   return (
-    <section className="bg-cloud p-5">
-      <h3 className="text-ink font-medium">다시 촬영해 주세요</h3>
-      <p className="text-charcoal mt-1 text-sm">{step.why}</p>
-      <p className="text-mute mt-2 text-xs">
+    <section className="border-hairline bg-surface rounded-lg border p-6">
+      <h3 className="title-md text-ink">다시 촬영해 주세요</h3>
+      <p className="text-ink-secondary mt-1 text-[15px]">{step.why}</p>
+      <p className="text-ink-muted mt-2 text-sm">
         라벨이 화면을 가득 채우도록, 빛 반사를 피해 정면에서 찍으면 잘 읽힙니다.
       </p>
     </section>

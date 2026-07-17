@@ -54,7 +54,7 @@ export default function PdfComposition({
       <button
         type="button"
         onClick={() => void read()}
-        className="rounded-pill border-hairline text-ink hover:border-ink mt-2.5 w-full border py-2 text-xs font-medium transition-colors"
+        className="rounded-md border-hairline bg-surface text-ink-secondary hover:border-ink-faint mt-2.5 w-full border py-2 text-sm font-medium transition-colors"
       >
         이 자료의 구성성분 보기
       </button>
@@ -63,7 +63,7 @@ export default function PdfComposition({
 
   if (state.phase === "reading") {
     return (
-      <p role="status" className="text-mute mt-2.5 text-xs">
+      <p role="status" className="text-ink-muted mt-2.5 text-xs">
         자료를 읽는 중입니다… (최대 20초)
       </p>
     );
@@ -87,12 +87,12 @@ function Composition({
 
   if (!extract.readable) {
     return (
-      <div className="bg-cloud mt-2.5 p-3">
-        <p className="text-charcoal text-xs">
+      <div className="bg-canvas rounded-md mt-2.5 p-3">
+        <p className="text-ink-secondary text-xs">
           이 자료에서 구성성분을 읽지 못했습니다.
           {extract.note && ` ${extract.note}`}
         </p>
-        <p className="text-mute mt-1 text-xs">
+        <p className="text-ink-muted mt-1 text-xs">
           원본 링크를 직접 열어 확인해 주세요.
         </p>
       </div>
@@ -100,19 +100,19 @@ function Composition({
   }
 
   return (
-    <div className="bg-cloud mt-2.5 space-y-2.5 p-3">
+    <div className="bg-canvas rounded-md mt-2.5 space-y-2.5 p-3">
       {/* 이 자료가 무엇인지부터 밝힌다. 사용자가 손에 든 용기와 대조해야 한다. */}
-      <div className="bg-canvas p-2.5">
-        <p className="text-mute text-[11px]">이 자료의 제품명</p>
+      <div className="bg-surface rounded-xs p-2.5">
+        <p className="text-ink-muted text-[11px]">이 자료의 제품명</p>
         <p className="text-ink font-medium break-words">
           {extract.productName ?? "(문서에 제품명이 없습니다)"}
         </p>
-        <p className="text-mute mt-1 text-xs">
+        <p className="text-ink-muted mt-1 text-xs">
           {extract.manufacturer && `${extract.manufacturer} · `}
           개정일 {extract.revisionDate ?? "미상"}
         </p>
         {labelProductName && (
-          <p className="text-charcoal mt-1.5 text-[11px] leading-relaxed">
+          <p className="text-ink-secondary mt-1.5 text-[11px] leading-relaxed">
             사진에서 읽은 제품명:{" "}
             <strong className="text-ink font-medium">{labelProductName}</strong> —
             두 이름이 같은 제품인지 확인하세요.
@@ -138,20 +138,20 @@ function Composition({
       )}
 
       <div>
-        <p className="text-mute mb-1.5 text-[11px] font-medium">
+        <p className="text-ink-muted mb-1.5 text-[11px] font-medium">
           구성성분 (문서 3항)
         </p>
         <ul className="space-y-px">
           {extract.ingredients.map((ing, i) => (
             <li
               key={`${ing.name}-${i}`}
-              className="bg-canvas flex flex-wrap items-baseline gap-x-2 px-2.5 py-2 text-xs"
+              className="bg-surface rounded-xs flex flex-wrap items-baseline gap-x-2 px-2.5 py-2 text-[13px]"
             >
               <span className="text-ink font-medium break-words">
                 {ing.name}
               </span>
               {ing.casNo && (
-                <span className="text-mute font-mono">CAS {ing.casNo}</span>
+                <span className="text-ink-muted font-mono">CAS {ing.casNo}</span>
               )}
               {ing.content && (
                 <span className="text-ink ml-auto shrink-0 font-medium">
@@ -163,7 +163,7 @@ function Composition({
         </ul>
       </div>
 
-      <p className="text-mute text-[11px] leading-relaxed">
+      <p className="text-ink-muted text-[11px] leading-relaxed">
         위 내용은 원본 PDF에서 옮긴 것입니다. 취급 판단은 원본 전문을 확인한 뒤
         하세요.
       </p>
@@ -171,7 +171,7 @@ function Composition({
   );
 }
 
-/** 경고는 색면이 아니라 왼쪽 색 선으로 낸다. 색면을 쓰면 위험도 판정과 경쟁한다. */
+/** 경고도 테두리가 아니라 은은한 틴트 면으로 낸다 — 이 시스템의 강조 방식이다. */
 function Alert({
   tone,
   title,
@@ -181,14 +181,14 @@ function Alert({
   title: string;
   children: React.ReactNode;
 }) {
-  const accent =
+  const skin =
     tone === "danger"
-      ? "border-hazard-danger text-hazard-danger"
-      : "border-hazard-warning text-hazard-warning";
+      ? "bg-hazard-danger-soft text-hazard-danger"
+      : "bg-hazard-warning-soft text-hazard-warning";
   return (
-    <div className={`border-l-2 pl-2.5 ${accent}`}>
-      <p className="text-xs font-medium">{title}</p>
-      <p className="text-charcoal mt-0.5 text-[11px] leading-relaxed">
+    <div className={`rounded-md p-2.5 ${skin}`}>
+      <p className="text-sm font-semibold">{title}</p>
+      <p className="text-ink-secondary mt-0.5 text-[13px] leading-relaxed">
         {children}
       </p>
     </div>

@@ -174,32 +174,32 @@ const HEADLINES: Record<RiskLevel, string> = {
 /**
  * 등급별 화면 표현.
  *
- * 색은 신호에만 쓴다. 판정이 danger·warning일 때만 색이 나타나고, 그 아래는
- * 무채색으로 물러선다. 나머지 화면이 전부 흑백이라야 이 빨강이 빨강으로 읽힌다.
- * 배지는 알약, 패널은 각진 면 — 이 시스템의 도형 어휘 그대로다.
+ * 판정은 색을 채운 작은 알약 하나가 말하고, 카드는 은은한 배경 틴트로만 거든다.
+ * 색 테두리를 두르지 않는 건 이 디자인 시스템의 방식을 따른 것이다 — 강조는
+ * "coloured border가 아니라 surface tint"로 한다. 위험도가 낮으면 색이 아예 없다.
  */
 export const RISK_STYLE: Record<
   RiskLevel,
   { badge: string; panel: string; label: string }
 > = {
   danger: {
-    badge: "bg-hazard-danger text-canvas",
-    panel: "border-hazard-danger",
+    badge: "bg-hazard-danger text-white",
+    panel: "bg-hazard-danger-soft",
     label: "위험",
   },
   warning: {
-    badge: "bg-hazard-warning text-canvas",
-    panel: "border-hazard-warning",
+    badge: "bg-hazard-warning text-white",
+    panel: "bg-hazard-warning-soft",
     label: "주의",
   },
   caution: {
-    badge: "bg-ink text-canvas",
-    panel: "border-ink",
+    badge: "bg-ink-secondary text-white",
+    panel: "bg-surface",
     label: "유의",
   },
   unknown: {
-    badge: "bg-cloud text-mute",
-    panel: "border-hairline",
+    badge: "bg-canvas text-ink-muted",
+    panel: "bg-surface",
     label: "정보 부족",
   },
 };

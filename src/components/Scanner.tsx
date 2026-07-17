@@ -68,32 +68,31 @@ export default function Scanner() {
       />
 
       {state.phase === "idle" ? (
-        // 촬영 전 화면. 사진이 들어올 자리를 cloud로 비워두고, 그 위에 검은 알약
-        // 하나만 얹는다 — 이 시스템에서 "이미지 위 CTA"가 놓이는 자리 그대로다.
-        <div className="bg-cloud flex flex-col items-center gap-5 px-6 py-16">
+        // 촬영 전 화면. 캔버스 위에 뜬 흰 카드 하나 — 이 시스템의 기본 도형이다.
+        <div className="border-hairline bg-surface rounded-lg flex flex-col items-center gap-5 border px-6 py-14">
           <CameraIcon />
-          <p className="text-mute max-w-xs text-center text-sm leading-relaxed">
+          <p className="text-ink-muted max-w-xs text-center text-[15px] leading-relaxed">
             그림문자와 성분표가 함께 보이도록 찍으면 가장 정확합니다
           </p>
+          {/* 이 화면의 유일한 파랑. 파랑이 곧 "여기를 누르시오"다. */}
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="rounded-pill bg-ink text-canvas px-8 py-4 text-base font-medium transition-transform active:scale-95"
+            className="bg-primary active:bg-primary-active rounded-full px-7 py-3 text-base font-medium text-white transition-transform active:scale-95"
           >
             제품 라벨 촬영하기
           </button>
         </div>
       ) : (
         <div className="space-y-5">
-          {/* 사진은 이 시스템의 제품 사진과 같은 자리에 놓인다 — cloud 위에 여백 없이,
-              테두리 없이. 화면에서 유일하게 색을 가진 면이다. 바로 아래 "다시 촬영"을
-              붙여 결과가 길어져도 스크롤 없이 다시 찍을 수 있게 한다. */}
+          {/* 사진은 둥근 틀 안에 담긴다 — 이 시스템이 스크린샷을 다루는 방식 그대로다.
+              바로 아래 "다시 촬영"을 붙여 결과가 길어져도 스크롤 없이 다시 찍게 한다. */}
           {state.preview && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={state.preview}
               alt="촬영한 라벨"
-              className="bg-cloud max-h-72 w-full object-contain"
+              className="border-hairline bg-surface rounded-lg max-h-72 w-full border object-contain"
             />
           )}
 
@@ -101,7 +100,7 @@ export default function Scanner() {
             <button
               type="button"
               onClick={reset}
-              className="rounded-pill bg-ink text-canvas w-full py-3.5 text-base font-medium transition-transform active:scale-95"
+              className="border-hairline bg-surface text-ink rounded-md w-full border py-2.5 text-base font-medium transition-transform active:scale-95"
             >
               다시 촬영하기
             </button>
@@ -110,11 +109,13 @@ export default function Scanner() {
           {state.phase === "reading" && <ReadingIndicator />}
 
           {state.phase === "error" && (
-            <div className="border-hazard-danger border p-5">
-              <h2 className="text-hazard-danger font-medium">
+            <div className="border-hairline bg-hazard-danger-soft rounded-lg border p-5">
+              <h2 className="text-hazard-danger title-md">
                 판독하지 못했습니다
               </h2>
-              <p className="text-charcoal mt-1 text-sm">{state.message}</p>
+              <p className="text-ink-secondary mt-1 text-[15px]">
+                {state.message}
+              </p>
             </div>
           )}
 
@@ -127,9 +128,12 @@ export default function Scanner() {
 
 function ReadingIndicator() {
   return (
-    <div role="status" className="bg-cloud flex items-center gap-3 p-5">
-      <span className="border-hairline border-t-ink size-5 animate-spin rounded-full border-2" />
-      <span className="text-charcoal text-sm font-medium">
+    <div
+      role="status"
+      className="border-hairline bg-surface rounded-lg flex items-center gap-3 border p-5"
+    >
+      <span className="border-hairline border-t-primary size-5 animate-spin rounded-full border-2" />
+      <span className="text-ink-secondary text-[15px]">
         라벨을 읽는 중입니다…
       </span>
     </div>
@@ -144,7 +148,7 @@ function CameraIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
-      className="text-mute size-12"
+      className="text-ink-faint size-12"
     >
       <path
         strokeLinecap="round"

@@ -67,25 +67,25 @@ export default function MsdsFinder({
   }
 
   return (
-    <section className="border-hairline space-y-5 border-t pt-6">
+    <section className="border-hairline bg-surface rounded-lg space-y-5 border p-6">
       <div>
-        <h3 className="text-ink text-base font-medium">국문 MSDS 찾기</h3>
-        <p className="text-mute mt-1 text-xs">
+        <h3 className="title-md text-ink">국문 MSDS 찾기</h3>
+        <p className="text-ink-muted mt-1 text-sm">
           제품명이 잘못 읽혔으면 고쳐서 다시 검색하세요.
         </p>
-        {/* 검색 알약. 기본은 cloud 위 테두리 없음, 포커스에서만 ink 테두리가 선다. */}
+        {/* 입력칸은 4px로 각지게. 알약은 CTA의 것이고 폼 필드에는 쓰지 않는다. */}
         <form onSubmit={submit} className="mt-3 flex gap-2">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="제품명, 물질명 또는 CAS 번호"
             aria-label="검색어"
-            className="rounded-field bg-cloud text-ink placeholder:text-mute focus:bg-canvas focus:border-ink min-w-0 flex-1 border-2 border-transparent px-4 py-2.5 text-base focus:outline-none"
+            className="rounded-xs border-hairline text-ink placeholder:text-ink-faint focus:border-primary min-w-0 flex-1 border px-3 py-2 text-[15px] focus:outline-none"
           />
           <button
             type="submit"
             disabled={!query.trim()}
-            className="rounded-pill bg-ink text-canvas shrink-0 px-5 py-2.5 text-sm font-medium transition-transform active:scale-95 disabled:opacity-30"
+            className="rounded-md bg-primary active:bg-primary-active shrink-0 px-4 py-2 text-[15px] font-medium text-white transition-transform active:scale-95 disabled:opacity-30"
           >
             검색
           </button>
@@ -150,9 +150,9 @@ function Group({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-hairline border-t pt-4">
-      <h4 className="text-ink text-sm font-medium">{title}</h4>
-      <p className="text-mute mt-0.5 text-xs leading-relaxed">{hint}</p>
+    <div className="border-hairline border-t pt-5">
+      <h4 className="text-ink text-[15px] font-semibold">{title}</h4>
+      <p className="text-ink-muted mt-0.5 text-sm leading-relaxed">{hint}</p>
       <div className="mt-3">{children}</div>
     </div>
   );
@@ -160,7 +160,7 @@ function Group({
 
 function Loading({ label }: { label: string }) {
   return (
-    <p role="status" className="text-mute text-sm">
+    <p role="status" className="text-ink-muted text-sm">
       {label}
     </p>
   );
@@ -179,7 +179,7 @@ function KoshaResults({
 }) {
   if (outcome.hits.length === 0) {
     return (
-      <p className="bg-cloud text-charcoal p-3 text-xs leading-relaxed">
+      <p className="bg-canvas rounded-md text-ink-secondary p-3 text-sm leading-relaxed">
         공단에서 찾지 못했습니다. 상표명 제품은 대개 여기 없으니 위의 제조사 자료를
         보세요. 법정 자료가 필요하면 용기 성분표의{" "}
         <strong className="text-ink font-medium">물질명이나 CAS 번호</strong>로
@@ -190,7 +190,7 @@ function KoshaResults({
 
   return (
     <>
-      <p className="text-mute text-xs">
+      <p className="text-ink-muted text-xs">
         <strong className="text-ink font-medium">
           &ldquo;{outcome.usedQuery}&rdquo;
         </strong>
@@ -219,18 +219,19 @@ function KoshaRow({ hit }: { hit: ChemHit }) {
       <input type="hidden" name="chem_id" value={hit.chemId} />
       <button
         type="submit"
-        className="border-hairline hover:border-ink flex w-full items-center gap-3 border-b py-3 text-left transition-colors"
+        className="border-hairline flex w-full items-center gap-3 border-b py-3 text-left"
       >
         <span className="min-w-0 flex-1">
           <span className="text-ink block font-medium break-words">
             {hit.nameKor}
           </span>
-          <span className="text-mute mt-0.5 block text-xs">
+          <span className="text-ink-muted mt-0.5 block text-sm">
             {hit.casNo ? `CAS ${hit.casNo}` : "CAS 없음"}
             {hit.lastDate && ` · 갱신 ${hit.lastDate}`}
           </span>
         </span>
-        <span className="text-ink shrink-0 text-xs font-medium underline underline-offset-4">
+        {/* 링크는 파랑. 다만 규격의 primary는 본문 크기에서 대비가 모자라 진한 쪽을 쓴다. */}
+        <span className="text-primary-active shrink-0 text-sm font-medium">
           원본 보기 ↗
         </span>
       </button>
@@ -239,14 +240,14 @@ function KoshaRow({ hit }: { hit: ChemHit }) {
 }
 
 /**
- * 출처 등급 배지. 믿을 수 있는 두 등급만 색을 채우고, 나머지는 cloud로 물러선다.
- * 2차 출처만 주의색 글자를 쓴다 — 배경까지 칠하면 위쪽 위험도 판정과 색이 경쟁한다.
+ * 출처 등급 배지. 흰 알약에 글자색으로만 등급을 말한다 — 이 시스템의 배지 방식이다.
+ * 파랑은 일부러 쓰지 않았다. 파랑은 "누르시오"를 뜻해야 하고, 이건 사실 표시다.
  */
 const TIER_STYLE: Record<SourceTier, string> = {
-  government: "bg-success text-canvas",
-  official: "bg-ink text-canvas",
-  vendor: "bg-cloud text-mute",
-  aggregator: "bg-cloud text-hazard-warning",
+  government: "bg-surface border-hairline border text-success",
+  official: "bg-surface border-hairline border text-ink",
+  vendor: "bg-canvas text-ink-muted",
+  aggregator: "bg-hazard-warning-soft text-hazard-warning",
 };
 
 function WebResults({
@@ -260,7 +261,7 @@ function WebResults({
 }) {
   if (outcome.hits.length === 0) {
     return (
-      <p className="bg-cloud text-charcoal p-3 text-xs leading-relaxed">
+      <p className="bg-canvas rounded-md text-ink-secondary p-3 text-sm leading-relaxed">
         웹에서도 찾지 못했습니다. 제품명을 라벨에 인쇄된 그대로(영문 포함) 입력해
         보세요.
       </p>
@@ -284,8 +285,8 @@ function WebResults({
           </li>
         ))}
       </ul>
-      <p className="border-hazard-warning text-charcoal mt-4 border-l-2 pl-3 text-xs leading-relaxed">
-        <strong className="text-hazard-warning font-medium">
+      <p className="bg-hazard-warning-soft rounded-md text-ink-secondary mt-4 p-3 text-sm leading-relaxed">
+        <strong className="text-hazard-warning font-semibold">
           제품 변형에 주의하세요.
         </strong>{" "}
         같은 브랜드라도 종류마다(예: 일반형·탈지제·건성윤활) MSDS가 다릅니다. 손에
@@ -301,24 +302,24 @@ function WebRow({ hit }: { hit: WebHit }) {
       href={hit.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="border-hairline hover:border-ink block border-b py-3 transition-colors"
+      className="border-hairline block border-b py-3"
     >
       <span className="flex flex-wrap items-center gap-1.5">
         <span
-          className={`rounded-pill px-2.5 py-0.5 text-[11px] font-medium ${TIER_STYLE[hit.grade.tier]}`}
+          className={`eyebrow rounded-full px-2 py-0.5 ${TIER_STYLE[hit.grade.tier]}`}
         >
           {hit.grade.label}
         </span>
         {hit.isPdf && (
-          <span className="rounded-pill border-hairline text-mute border px-2.5 py-0.5 text-[11px] font-medium">
+          <span className="eyebrow rounded-full bg-canvas text-ink-muted px-2 py-0.5">
             PDF
           </span>
         )}
       </span>
-      <span className="text-ink mt-1.5 block font-medium break-words">
+      <span className="text-primary-active mt-1.5 block font-medium break-words">
         {hit.title}
       </span>
-      <span className="text-mute mt-0.5 block text-xs break-all">
+      <span className="text-ink-muted mt-0.5 block text-sm break-all">
         {hit.grade.note}
       </span>
     </a>

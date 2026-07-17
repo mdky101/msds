@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111111",
+  themeColor: "#f6f5f4",
 };
 
 export default function RootLayout({
@@ -18,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full antialiased">
+      {/* 임상적인 순백이 아니라 종이 같은 따뜻한 캔버스. 이 위에 흰 카드를 얹는다. */}
       <body className="bg-canvas text-ink flex min-h-full flex-col font-sans">
         {children}
       </body>

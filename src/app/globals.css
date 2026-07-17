@@ -3,50 +3,59 @@
 @import "tailwindcss";
 
 /*
- * 디자인 시스템: 편집적 절제 (Nike 커머스 시스템 기반)
+ * 디자인 시스템: 좋은 햇빛 아래 잘 정리된 책상 (Notion 시스템 기반)
  *
- * 핵심은 "색은 신호에만 쓴다"이다. ink/canvas/cloud 세 가지가 화면의 95%를 덮고,
- * 색이 나타나면 그건 반드시 의미가 있다. 이 앱에는 잘 맞는다 — 위험도 색은
- * 장식이 아니라 신호이기 때문이다. 그래서 나머지를 전부 무채색으로 눌러야
- * 빨강이 진짜 빨강으로 읽힌다.
+ * 종이 같은 따뜻한 오프화이트 위에 흰 카드를 얹고, 회색과 검정으로만 말하다가
+ * 딱 한 가지 색(파랑)으로 행동을 가리킨다. 테두리는 헤어라인, 그림자는 거의 없다.
  *
- * 원본과 다르게 간 곳:
- * - display 폰트: Bebas Neue는 한글이 없다. 96px 대문자 Futura 로크업은 한글로
- *   재현 불가(대문자 개념 자체가 없음). Pretendard 900 + line-height 0.95 +
- *   타이트한 자간으로 같은 "빌보드" 효과를 한글 방식으로 낸다.
- * - hazard-warning: 원본 팔레트에 주황이 없다. 위험도는 4단계가 필요하므로
- *   토큰 하나만 추가했다. red(sale)는 원본 것을 그대로 쓴다.
+ * 이 앱에 맞게 확장한 곳:
+ * - 위험도 색: 원본에는 error/success 팔레트가 아예 없다. Notion은 "이걸 만지면
+ *   다친다"고 말할 일이 없기 때문이다. 스티커 팔레트가 있지만 장식 전용으로
+ *   못 박혀 있어 쓸 수 없다. 그래서 위험 신호 램프를 따로 뒀다.
+ * - 다만 표현 방식은 원본을 따른다: 원본이 강조 카드를 "coloured border가 아니라
+ *   surface tint"로 구분하므로, 위험도도 테두리 대신 은은한 배경 틴트로 낸다.
+ * - 폰트: Pretendard는 Inter의 한글판이라 원본의 자간 규격이 그대로 먹는다.
+ *   원본이 지시한 대로 큰 글씨일수록 자간을 더 당긴다.
  */
 @theme {
-  --font-sans: "Pretendard Variable", Pretendard, -apple-system, system-ui,
-    sans-serif;
+  --font-sans: "Pretendard Variable", Pretendard, Inter, -apple-system,
+    system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
 
-  /* 화면의 95%를 덮는 세 가지 */
-  --color-ink: #111111;
-  --color-canvas: #ffffff;
-  --color-cloud: #f5f5f5;
+  /* 종이 같은 따뜻한 캔버스 위에 흰 카드. 임상적인 순백 전면은 쓰지 않는다. */
+  --color-canvas: #f6f5f4;
+  --color-surface: #ffffff;
+  --color-hairline: #e6e6e6;
 
-  /* 이 시스템의 유일한 "그림자" — 1px 실선 */
-  --color-hairline: #cacacb;
-  --color-hairline-soft: #e5e5e5;
+  /* 순검정이 아니라 95% — 부드러운 진검정 */
+  --color-ink: rgba(0, 0, 0, 0.95);
+  --color-ink-secondary: #31302e;
+  --color-ink-muted: #615d59;
+  --color-ink-faint: #a39e98;
 
-  /* 글자 위계 */
-  --color-charcoal: #39393b;
-  --color-mute: #707072;
-  --color-stone: #9e9ea0;
+  /* 이 시스템의 유일한 구조적 강조색. 행동과 링크에만 쓴다. */
+  --color-primary: #0075de;
+  --color-primary-active: #005bab;
 
-  /* 신호색. 여기 있는 것 외에는 화면에 색이 없어야 한다. */
-  --color-sale: #d30005;
-  --color-success: #007d48;
-  --color-info: #1151ff;
+  /*
+   * 위험 신호 (원본에 없어 추가). 파랑이 "행동"이라면 이건 "경고"다.
+   * 배지는 채운 색, 카드는 틴트 — 두 역할이 섞이지 않게 나눈다.
+   */
+  --color-hazard-danger: #c02535;
+  --color-hazard-danger-soft: #fdf3f3;
+  --color-hazard-warning: #8a4200;
+  --color-hazard-warning-soft: #fdf6f0;
+  --color-success: #1a7f37;
 
-  /* 위험도 신호. sale의 빨강을 최고 위험에 그대로 쓴다 — 이 시스템의 유일한 빨강. */
-  --color-hazard-danger: #d30005;
-  --color-hazard-warning: #b45309;
+  /* 폼 필드는 알약이 아니라 4px. CTA와 일부러 다르게 둔다. */
+  --radius-xs: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
-  /* 이 시스템의 도형 어휘는 알약과 원, 둘뿐이다. 각진 버튼은 없다. */
-  --radius-pill: 30px;
-  --radius-field: 24px;
+  /* 그림자는 "거의 없음". 투명에 가까운 여러 겹으로 종이에서 살짝 뜬 느낌만 낸다. */
+  --shadow-soft:
+    rgba(0, 0, 0, 0.01) 0 0.175px 1.041px, rgba(0, 0, 0, 0.02) 0 0.8px 2.925px,
+    rgba(0, 0, 0, 0.027) 0 2.025px 7.847px, rgba(0, 0, 0, 0.04) 0 4px 18px;
 }
 
 html {
@@ -55,13 +64,46 @@ html {
 }
 
 /*
- * 편집 로크업. 원본의 96px 대문자 Futura 자리다.
- * 한글은 900 웨이트로 눌러 담고 자간을 좁혀야 비슷한 밀도가 나온다.
+ * 제목 위계. 원본의 핵심은 "클수록 자간을 더 당긴다"이다 — 그래야 큰 글씨가
+ * 늘어지지 않고 눌러 담은 듯 보인다. 본문은 400을 지켜 읽기 편하게 둔다.
+ *
+ * 이름과 자간은 원본 표를 그대로 따르되, 크기는 폰 화면에 맞게 줄였다
+ * (display-1 64→44px, title 20→17px). 데스크톱 히어로용 64px를 폰에 그대로
+ * 쓰면 한 줄에 다섯 글자밖에 안 들어간다.
  */
-@utility display-lockup {
-  font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: -0.035em;
+@utility display-1 {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+
+@utility heading-2 {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.23;
+  letter-spacing: -0.625px;
+}
+
+@utility heading-3 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.27;
+  letter-spacing: -0.25px;
+}
+
+@utility title-md {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.125px;
+}
+
+@utility eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.33;
+  letter-spacing: 0.125px;
 }
 
 /* 접힘 화살표는 기본 삼각형 대신 직접 그린다 */
