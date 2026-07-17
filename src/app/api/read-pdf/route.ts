@@ -3,6 +3,12 @@ import { readMsdsPdf } from "@/lib/geminiPdf";
 import { PdfFetchError, fetchPdf } from "@/lib/pdfFetch";
 import { assessStaleness, crossCheckCas, type MsdsExtract } from "@/lib/msdsDoc";
 
+/**
+ * PDF 내려받기(최대 15초) + Gemini 판독(실측 5~18초, 최대 45초).
+ * Vercel 기본값 10초로는 그냥 실패한다.
+ */
+export const maxDuration = 60;
+
 export interface ReadPdfResult {
   extract: MsdsExtract;
   staleness: ReturnType<typeof assessStaleness>;

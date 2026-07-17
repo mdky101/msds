@@ -1,6 +1,9 @@
 import { KoshaError } from "@/lib/kosha";
 import { fetchSummary } from "@/lib/koshaDetail";
 
+/** 5개 항목을 병렬 조회한다(각 10초 제한). 실측 0.1~0.8초. */
+export const maxDuration = 20;
+
 export async function GET(request: Request): Promise<Response> {
   const chemId = new URL(request.url).searchParams.get("chemId")?.trim();
 

@@ -1,5 +1,8 @@
 import { NaverError, searchWeb } from "@/lib/naver";
 
+/** 네이버 쿼리를 최대 3개 던진다(각 8초 제한). */
+export const maxDuration = 30;
+
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
   try {

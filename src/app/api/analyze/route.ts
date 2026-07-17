@@ -3,6 +3,9 @@ import { GeminiError, readLabel } from "@/lib/gemini";
 import type { AnalyzeResult, NextStep } from "@/lib/types";
 import type { LabelReading } from "@/lib/types";
 
+/** 라벨 판독은 실측 3~7초. Vercel 기본값 10초로는 아슬아슬하다. */
+export const maxDuration = 30;
+
 /** 무료 티어 보호. 폰 카메라 사진은 리사이즈 후 보통 1MB 미만이다. */
 const MAX_BYTES = 6 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];

@@ -1,5 +1,8 @@
 import { KoshaError, searchMsds } from "@/lib/kosha";
 
+/** CAS + 이름 사다리로 KOSHA를 최대 4번 순차 호출한다(각 10초 제한). */
+export const maxDuration = 45;
+
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
   try {
