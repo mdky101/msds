@@ -113,7 +113,7 @@ function Composition({
         </p>
         {labelProductName && (
           <p className="text-ink-secondary mt-1.5 text-[11px] leading-relaxed">
-            사진에서 읽은 제품명:{" "}
+            찾으시는 제품명:{" "}
             <strong className="text-ink font-medium">{labelProductName}</strong> —
             두 이름이 같은 제품인지 확인하세요.
           </p>

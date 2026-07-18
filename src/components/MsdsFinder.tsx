@@ -14,6 +14,7 @@ import PdfComposition from "./PdfComposition";
 import MsdsSummaryPanel from "./MsdsSummaryPanel";
 
 type Panel<T> =
+  | { phase: "idle" }
   | { phase: "loading" }
   | { phase: "done"; data: T }
   | { phase: "error"; message: string };
@@ -23,15 +24,21 @@ export default function MsdsFinder({
   casNumbers,
   manufacturer,
   photoPictograms,
+  // 사진 없이 이름만으로 검색하는 모드. 판독 한도(Gemini)가 차도 검색은 되므로
+  // 그 우회로로 쓴다. 이때는 자동 검색하지 않고 사용자 입력을 기다린다.
+  standalone = false,
 }: {
   initialQuery: string;
   casNumbers: string[];
   manufacturer: string | null;
   photoPictograms: GhsCode[];
+  standalone?: boolean;
 }) {
   const [query, setQuery] = useState(initialQuery);
-  const [kosha, setKosha] = useState<Panel<SearchOutcome>>({ phase: "loading" });
-  const [web, setWeb] = useState<Panel<WebSearchOutcome>>({ phase: "loading" });
+  const seeded = initialQuery.trim() !== "";
+  const initial: Panel<never> = seeded ? { phase: "loading" } : { phase: "idle" };
+  const [kosha, setKosha] = useState<Panel<SearchOutcome>>(initial);
+  const [web, setWeb] = useState<Panel<WebSearchOutcome>>(initial);
   const firstRun = useRef(true);
 
   const run = useCallback(
@@ -56,7 +63,8 @@ export default function MsdsFinder({
   useEffect(() => {
     if (!firstRun.current) return;
     firstRun.current = false;
-    run(initialQuery, casNumbers);
+    // 씨앗(사진에서 읽은 제품명)이 있을 때만 자동 검색. 없으면 입력을 기다린다.
+    if (initialQuery.trim()) run(initialQuery, casNumbers);
   }, [initialQuery, casNumbers, run]);
 
   function submit(e: React.FormEvent) {
@@ -71,7 +79,9 @@ export default function MsdsFinder({
       <div>
         <h3 className="title-md text-ink">국문 MSDS 찾기</h3>
         <p className="text-ink-muted mt-1 text-sm">
-          제품명이 잘못 읽혔으면 고쳐서 다시 검색하세요.
+          {standalone
+            ? "제품명, 물질명 또는 CAS 번호를 입력해 검색하세요."
+            : "제품명이 잘못 읽혔으면 고쳐서 다시 검색하세요."}
         </p>
         {/* 입력칸은 4px로 각지게. 알약은 CTA의 것이고 폼 필드에는 쓰지 않는다. */}
         <form onSubmit={submit} className="mt-3 flex gap-2">
@@ -98,13 +108,14 @@ export default function MsdsFinder({
         title="제조사 공식 자료 (웹 검색)"
         hint="제조사 사이트의 SDS 페이지로 안내합니다. 상표명 제품은 여기서 찾힙니다."
       >
+        {web.phase === "idle" && <Idle />}
         {web.phase === "loading" && <Loading label="웹에서 찾는 중…" />}
         {web.phase === "error" && <ErrorLine message={web.message} />}
         {web.phase === "done" && (
           <WebResults
             outcome={web.data}
             labelCasNumbers={casNumbers}
-            labelProductName={initialQuery || null}
+            labelProductName={query.trim() || null}
           />
         )}
       </Group>
@@ -113,6 +124,7 @@ export default function MsdsFinder({
         title="안전보건공단 정식 자료"
         hint="법정 국문 MSDS입니다. 물질 단위라 상표명 제품은 잘 나오지 않고, 성분의 물질명이나 CAS 번호로 찾을 때 걸립니다."
       >
+        {kosha.phase === "idle" && <Idle />}
         {kosha.phase === "loading" && <Loading label="공단에서 찾는 중…" />}
         {kosha.phase === "error" && <ErrorLine message={kosha.message} />}
         {kosha.phase === "done" && (
@@ -156,6 +168,10 @@ function Group({
       <div className="mt-3">{children}</div>
     </div>
   );
+}
+
+function Idle() {
+  return <p className="text-ink-faint text-sm">검색어를 입력하면 여기에 결과가 나옵니다.</p>;
 }
 
 function Loading({ label }: { label: string }) {

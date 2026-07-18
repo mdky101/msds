@@ -3,16 +3,20 @@
 import { useRef, useState } from "react";
 import { shrinkImage } from "@/lib/resize";
 import type { AnalyzeResult } from "@/lib/types";
+import MsdsFinder from "./MsdsFinder";
 import VerdictCard from "./VerdictCard";
 
 type State =
   | { phase: "idle" }
   | { phase: "reading"; preview: string }
   | { phase: "done"; preview: string; result: AnalyzeResult }
-  | { phase: "error"; preview: string | null; message: string };
+  | { phase: "error"; preview: string | null; message: string; isLimit: boolean };
 
 export default function Scanner() {
   const [state, setState] = useState<State>({ phase: "idle" });
+  // 사진 없이 제품명으로만 검색하는 모드. 검색은 Gemini를 안 쓰므로 판독 한도가
+  // 차도 동작한다. 그 우회로다.
+  const [manual, setManual] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(file: File) {
@@ -32,6 +36,7 @@ export default function Scanner() {
           phase: "error",
           preview,
           message: payload?.message ?? "판독에 실패했습니다.",
+          isLimit: res.status === 429,
         });
         return;
       }
@@ -41,6 +46,7 @@ export default function Scanner() {
         phase: "error",
         preview,
         message: "네트워크 오류입니다. 연결을 확인하고 다시 시도해 주세요.",
+        isLimit: false,
       });
     }
   }
@@ -50,7 +56,35 @@ export default function Scanner() {
       URL.revokeObjectURL(state.preview);
     }
     setState({ phase: "idle" });
+    setManual(false);
     if (inputRef.current) inputRef.current.value = "";
+  }
+
+  if (manual) {
+    return (
+      <div className="space-y-5">
+        <div className="border-hairline bg-surface rounded-lg border p-6">
+          <h2 className="title-md text-ink">제품명으로 검색</h2>
+          <p className="text-ink-muted mt-1 text-sm leading-relaxed">
+            사진 없이 국문 MSDS만 찾습니다. 위험도 판정은 라벨을 촬영해야 나옵니다.
+          </p>
+        </div>
+        <MsdsFinder
+          initialQuery=""
+          casNumbers={[]}
+          manufacturer={null}
+          photoPictograms={[]}
+          standalone
+        />
+        <button
+          type="button"
+          onClick={reset}
+          className="rounded-md border-hairline bg-surface text-ink-secondary hover:border-ink-faint w-full border py-2.5 text-base font-medium transition-colors"
+        >
+          라벨 촬영으로 돌아가기
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -82,6 +116,13 @@ export default function Scanner() {
           >
             제품 라벨 촬영하기
           </button>
+          <button
+            type="button"
+            onClick={() => setManual(true)}
+            className="text-primary-active text-sm font-medium underline underline-offset-4"
+          >
+            사진 없이 제품명으로 검색
+          </button>
         </div>
       ) : (
         <div className="space-y-5">
@@ -111,11 +152,23 @@ export default function Scanner() {
           {state.phase === "error" && (
             <div className="border-hairline bg-hazard-danger-soft rounded-lg border p-5">
               <h2 className="text-hazard-danger title-md">
-                판독하지 못했습니다
+                {state.isLimit ? "오늘 판독 한도를 다 썼습니다" : "판독하지 못했습니다"}
               </h2>
-              <p className="text-ink-secondary mt-1 text-[15px]">
+              <p className="text-ink-secondary mt-1 text-[15px] leading-relaxed">
                 {state.message}
               </p>
+              {/* 판독(Gemini)은 막혔어도 검색은 된다. 그 우회로를 바로 연다. */}
+              <p className="text-ink-secondary mt-2 text-sm leading-relaxed">
+                사진 판독은 안 되지만, <strong className="font-semibold">제품명을
+                입력하면 MSDS는 찾을 수 있습니다.</strong>
+              </p>
+              <button
+                type="button"
+                onClick={() => setManual(true)}
+                className="bg-primary active:bg-primary-active rounded-full mt-3 px-6 py-2.5 text-[15px] font-medium text-white transition-transform active:scale-95"
+              >
+                제품명으로 검색하기
+              </button>
             </div>
           )}
 
