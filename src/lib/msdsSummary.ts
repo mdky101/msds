@@ -38,6 +38,18 @@ export interface MsdsSummary {
   sections: SummarySection[];
 }
 
+/**
+ * CAS로 특정한 물질의 공단 공식 GHS 정보. 사진에서 작은 그림문자를 인식하는 대신,
+ * 큰 글씨인 CAS를 읽어 정부 공식 그림문자를 가져오는 경로에 쓴다.
+ */
+export interface OfficialGhs {
+  chemId: string;
+  nameKor: string;
+  casNo: string;
+  pictograms: GhsCode[];
+  signalWord: string | null;
+}
+
 /** KOSHA는 그림문자를 "GHS02.gif|GHS07.gif|GHS08.gif"처럼 파일명으로 준다. */
 export function parsePictogramFiles(items: string[]): GhsCode[] {
   const codes = items

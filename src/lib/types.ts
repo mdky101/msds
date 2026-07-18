@@ -1,4 +1,5 @@
 import type { GhsCode, RiskVerdict, SignalWord } from "./ghs";
+import type { OfficialGhs } from "./msdsSummary";
 
 /**
  * 사진 속 라벨에서 "읽어낸" 것. 추론이나 모델의 사전지식이 아니라
@@ -27,6 +28,12 @@ export interface AnalyzeResult {
   verdict: RiskVerdict;
   /** 다음에 무엇을 하면 되는지 (성분표 촬영 유도 등) */
   nextStep: NextStep;
+  /**
+   * CAS가 읽혔고 공단에 등재된 경우, 그 물질의 공식 그림문자·신호어.
+   * 사진에서 인식한 것보다 권위 있는 값이라 판정 아래에 함께 보여준다.
+   * 못 찾으면 null (판독 자체는 정상).
+   */
+  officialGhs: OfficialGhs | null;
 }
 
 export type NextStep =

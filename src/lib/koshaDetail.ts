@@ -1,8 +1,9 @@
-import { KoshaError } from "./kosha";
+import { KoshaError, searchMsds } from "./kosha";
 import {
   SUMMARY_SECTIONS,
   parsePictogramFiles,
   type MsdsSummary,
+  type OfficialGhs,
   type SummaryGroup,
   type SummarySection,
 } from "./msdsSummary";
@@ -125,4 +126,41 @@ export async function fetchSummary(chemId: string): Promise<MsdsSummary> {
   });
 
   return { chemId, officialPictograms, officialSignalWord, sections };
+}
+
+/**
+ * CAS로 물질을 특정해 공단 공식 그림문자·신호어만 가져온다. chemdetail02 한 항목만
+ * 필요하므로 fetchSummary보다 가볍다.
+ *
+ * 사진 판독 흐름에 끼우는 용도라 실패해도 조용히 null을 돌려준다 — 공식 그림문자를
+ * 못 얻는다고 판독 자체를 실패시키면 안 된다.
+ */
+export async function fetchOfficialGhsByCas(
+  cas: string,
+): Promise<OfficialGhs | null> {
+  try {
+    // CAS로 chemId를 먼저 찾는다. searchMsds가 CAS 우선 검색을 이미 한다.
+    const { hits } = await searchMsds(null, [cas], 1);
+    const hit = hits[0];
+    if (!hit) return null;
+
+    const raw = await fetchSection("chemdetail02", hit.chemId);
+    let pictograms: ReturnType<typeof parsePictogramFiles> = [];
+    let signalWord: string | null = null;
+    for (const item of raw) {
+      if (item.code === PICTOGRAM_CODE) pictograms = parsePictogramFiles(item.items);
+      if (item.code === SIGNAL_WORD_CODE) signalWord = item.items[0] ?? null;
+    }
+
+    if (pictograms.length === 0 && !signalWord) return null;
+    return {
+      chemId: hit.chemId,
+      nameKor: hit.nameKor,
+      casNo: hit.casNo ?? cas,
+      pictograms,
+      signalWord,
+    };
+  } catch {
+    return null;
+  }
 }

@@ -1,4 +1,5 @@
 import { GHS_CATALOG, RISK_STYLE } from "@/lib/ghs";
+import { diffPictograms, type OfficialGhs } from "@/lib/msdsSummary";
 import type { AnalyzeResult } from "@/lib/types";
 import MsdsFinder from "./MsdsFinder";
 
@@ -34,9 +35,18 @@ export default function VerdictCard({ result }: { result: AnalyzeResult }) {
         </ul>
       </section>
 
+      {result.officialGhs && (
+        <OfficialGhsCard
+          official={result.officialGhs}
+          photoPictograms={reading.pictograms}
+        />
+      )}
+
       {reading.pictograms.length > 0 && (
         <section className="border-hairline bg-surface rounded-lg border p-6">
-          <h3 className="eyebrow text-ink-muted">라벨에서 찾은 그림문자</h3>
+          <h3 className="eyebrow text-ink-muted">
+            {result.officialGhs ? "사진에서 읽은 그림문자" : "라벨에서 찾은 그림문자"}
+          </h3>
           <ul className="mt-3 space-y-3">
             {reading.pictograms.map((code) => {
               const info = GHS_CATALOG[code];
@@ -82,6 +92,65 @@ export default function VerdictCard({ result }: { result: AnalyzeResult }) {
         제품의 원본 MSDS이며, 취급 전 반드시 원본을 확인하세요.
       </p>
     </div>
+  );
+}
+
+/**
+ * CAS로 특정한 물질의 공단 공식 그림문자. 사진에서 작은 아이콘을 인식하는 것보다
+ * 정확하고, 사진이 놓친 그림문자를 잡아준다. 다만 공단은 순물질 기준이라 혼합물
+ * 제품과 다를 수 있음을 밝힌다.
+ */
+function OfficialGhsCard({
+  official,
+  photoPictograms,
+}: {
+  official: OfficialGhs;
+  photoPictograms: AnalyzeResult["reading"]["pictograms"];
+}) {
+  const diff = diffPictograms(photoPictograms, official.pictograms);
+
+  return (
+    <section className="border-hairline bg-surface rounded-lg border p-6">
+      <h3 className="eyebrow text-ink-muted">
+        공단 공식 그림문자 · CAS {official.casNo}
+      </h3>
+      {official.signalWord && (
+        <p className="text-ink mt-2 text-[15px]">
+          신호어 <strong className="font-semibold">«{official.signalWord}»</strong>
+        </p>
+      )}
+      <ul className="mt-3 space-y-3">
+        {official.pictograms.map((code) => {
+          const info = GHS_CATALOG[code];
+          return (
+            <li key={code} className="flex items-start gap-3">
+              <span className="bg-canvas text-ink-muted rounded-xs mt-0.5 shrink-0 px-1.5 py-0.5 font-mono text-[11px]">
+                {code}
+              </span>
+              <span className="text-[15px]">
+                <strong className="text-ink font-semibold">{info.name}</strong>
+                <span className="text-ink-secondary"> — {info.meaning}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      {diff.missedOnPhoto.length > 0 && photoPictograms.length > 0 && (
+        <p className="bg-hazard-warning-soft rounded-md text-ink-secondary mt-3 p-3 text-[13px] leading-relaxed">
+          <strong className="text-hazard-warning font-semibold">
+            사진에서 놓친 유해성이 있습니다.
+          </strong>{" "}
+          공단 자료에는 있으나 사진에서 확인되지 않은 것:{" "}
+          {diff.missedOnPhoto.map((c) => GHS_CATALOG[c].name).join(", ")}.
+        </p>
+      )}
+
+      <p className="text-ink-muted mt-3 text-[13px] leading-relaxed">
+        이 물질(순물질) 기준의 공식 정보입니다. 제품이 혼합물이면 실제 라벨과 다를
+        수 있습니다.
+      </p>
+    </section>
   );
 }
 

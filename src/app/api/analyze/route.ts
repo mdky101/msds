@@ -1,7 +1,9 @@
 import { assessRisk } from "@/lib/ghs";
 import { GeminiError, readLabel } from "@/lib/gemini";
+import { fetchOfficialGhsByCas } from "@/lib/koshaDetail";
 import type { AnalyzeResult, NextStep } from "@/lib/types";
 import type { LabelReading } from "@/lib/types";
+import type { OfficialGhs } from "@/lib/msdsSummary";
 
 /** 라벨 판독은 실측 3~7초. Vercel 기본값 10초로는 아슬아슬하다. */
 export const maxDuration = 30;
@@ -43,14 +45,30 @@ export async function POST(request: Request): Promise<Response> {
     return fail(500, "internal", "판독 중 오류가 발생했습니다.");
   }
 
+  // CAS를 읽었으면 그 물질의 공단 공식 그림문자를 가져온다. 사진에서 작은
+  // 그림문자를 인식하는 것보다 정확하고, 사진이 놓친 것을 잡아준다(예: 아세톤 GHS08).
+  // 실패해도 판독은 그대로 돌려준다.
+  let officialGhs: OfficialGhs | null = null;
+  const firstCas = reading.casNumbers[0];
+  if (firstCas) {
+    officialGhs = await fetchOfficialGhsByCas(firstCas);
+  }
+
   const result: AnalyzeResult = {
     reading,
     verdict: assessRisk({
       pictograms: reading.pictograms,
       signalWord: reading.signalWord,
       isChemicalProduct: reading.isChemicalProduct,
+      official: officialGhs
+        ? {
+            pictograms: officialGhs.pictograms,
+            signalWord: officialGhs.signalWord,
+          }
+        : null,
     }),
     nextStep: decideNextStep(reading),
+    officialGhs,
   };
 
   return Response.json(result);

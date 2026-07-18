@@ -118,6 +118,16 @@ export interface RiskInput {
   pictograms: GhsCode[];
   signalWord: SignalWord | null;
   isChemicalProduct: boolean;
+  /**
+   * CAS로 특정한 공단 공식 그림문자·신호어. 있으면 판정에 함께 반영한다.
+   * 사진이 놓친 유해성(예: 아세톤 GHS08)을 판정 배지가 저평가하지 않게 하기 위함이다.
+   * 공단은 순물질 기준이라 혼합물 제품보다 과경고할 수 있으나, 안전 앱에서는
+   * 저평가보다 과경고가 안전한 방향이다.
+   */
+  official?: {
+    pictograms: GhsCode[];
+    signalWord: string | null;
+  } | null;
 }
 
 /**
@@ -131,6 +141,7 @@ export function assessRisk({
   pictograms,
   signalWord,
   isChemicalProduct,
+  official,
 }: RiskInput): RiskVerdict {
   const known = pictograms.filter((code) => code in GHS_CATALOG);
   const reasons: string[] = [];
@@ -151,6 +162,26 @@ export function assessRisk({
   } else if (signalWord === "경고") {
     reasons.push('신호어 "경고"');
     if (RISK_ORDER.warning > RISK_ORDER[level]) level = "warning";
+  }
+
+  // 공단 공식 자료가 있으면 사진이 못 본 유해성을 보탠다. 출처를 명시해
+  // 사진에서 읽은 것과 구분한다.
+  if (official) {
+    for (const code of official.pictograms) {
+      if (!(code in GHS_CATALOG)) continue;
+      if (known.includes(code)) continue; // 사진에서 이미 반영됨
+      const info = GHS_CATALOG[code];
+      reasons.push(
+        `${info.name} — 공단 공식 자료 기준 (사진에서는 확인되지 않음)`,
+      );
+      if (RISK_ORDER[info.severity] > RISK_ORDER[level]) {
+        level = info.severity;
+      }
+    }
+    if (official.signalWord === "위험" && RISK_ORDER.danger > RISK_ORDER[level]) {
+      reasons.push('공단 공식 신호어 "위험"');
+      level = "danger";
+    }
   }
 
   if (level === "unknown") {
